@@ -57,6 +57,8 @@
         "memory_resource": "cpp",
         "random": "cpp",
         "set": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "regex": "cpp",
+        "unordered_set": "cpp"
     }
 }
