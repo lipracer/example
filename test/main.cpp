@@ -9,23 +9,14 @@
 
 #include "Graph.h"
 #include "DominatorTree.h"
+#include "STLExt.h"
 
 using namespace example;
 
-template <typename T>
-struct A {
-  void static call() {
-    std::cout << typeid(T).name() << std::endl;
-  }
-};
-
-struct B {
-  template <typename T>
-  B(T&& t) : fptr(&A<T>::call) {}
-  void (*fptr)(void);
-
-  void operator()(){
-    (*fptr)();
+struct Functor {
+  int operator()(int n) {
+    std::cout << "n:" << n << std::endl;
+    return n;
   }
 };
 
@@ -56,9 +47,9 @@ int main(int argc, char** args) {
   addSuccessor('H', {'M'});
 
   buildDominatorTree(&graph[0]);
-  A<int> ai;
-  B b(ai);
-  b();
+
+  MyFunction<int(int)> myFunc = Functor();
+  myFunc(0);
 
   // std::cout << graph << std::endl;
   return 0;
