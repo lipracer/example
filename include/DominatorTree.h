@@ -1,5 +1,5 @@
-#ifndef DOMINATORTREE_H
-#define DOMINATORTREE_H
+#ifndef INCLUDE_DOMINATORTREE_H
+#define INCLUDE_DOMINATORTREE_H
 
 #include <unordered_map>
 #include <unordered_set>
