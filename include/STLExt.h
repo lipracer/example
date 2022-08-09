@@ -4,7 +4,6 @@
 
 #include <utility>
 
-
 namespace example {
 
 class MyAnyData {
@@ -39,7 +38,6 @@ struct Invoker {
 
 template <typename R, typename... Args>
 struct MyFunction<R(Args...)> {
-
   template <typename Functor>
   MyFunction(Functor);
 
@@ -55,9 +53,7 @@ struct MyFunction<R(Args...)> {
 template <typename R, typename... Args>
 template <typename Functor>
 MyFunction<R(Args...)>::MyFunction(Functor t)
-    : funPtr(Invoker<Functor, R, Args...>::__Invoker), anyDataBuf(t) {
-  ;
-}
+    : funPtr(Invoker<Functor, R, Args...>::__Invoker), anyDataBuf(t) {}
 
 }  // namespace example
 
