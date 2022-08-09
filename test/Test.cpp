@@ -5,10 +5,10 @@ TestCaseCollection& TestCaseCollection::instance() {
   return __instance;
 }
 
-void TestCaseCollection::push(SuperTestClass* ptr) { data_.push_back(ptr); }
+void TestCaseCollection::push(SuperTestClass* ptr) { data_.push(ptr); }
 
 int main(int argc, char** args) {
-  for (auto ptr : TestCaseCollection::instance().data()) {
-    ptr->Testing();
+  for (const auto& node : TestCaseCollection::instance().data()) {
+    node.data->Testing();
   }
 }

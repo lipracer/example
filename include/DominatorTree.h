@@ -9,7 +9,7 @@
 
 namespace example {
 
-class DominatorTree {};
+struct DominatorTree {};
 
 template <typename T>
 auto buildDfsNumMap(const GraphNode<T>* root) {
@@ -131,6 +131,7 @@ DominatorTree buildDominatorTree(const GraphNode<T>* root) {
     }
     std::cout << std::endl;
   }
+  return {};
 }
 
 }  // namespace example
