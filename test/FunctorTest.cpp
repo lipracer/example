@@ -34,19 +34,12 @@ struct A {
   A(A&& a) {
     std::cout << "move constructor\n";
   }
-  A &operator=(A &&a) { std::cout << "assign constructor\n"; }
+  A &operator=(A &&a) {
+    std::cout << "assign constructor\n";
+    return *this;
+  }
 };
 
-struct B {
-  B(A &&a) { this->a = std::move(a); }
-
-private:
-  A a;
-};
-
-A getA() {
-  return A();
-}
 
 void print(const std::string& msg, float f) {
   std::cout << "float:" << f + 10.0 << std::endl;
@@ -56,32 +49,6 @@ void print(const std::string& msg, float f) {
   std::cout << msg << bs << std::endl;
 }
 
-template <typename T>
-struct xpu_numeric_limits;
-
-template <> struct xpu_numeric_limits<float> {
-  static constexpr float inf() { return 3.40282e+38; }
-  static constexpr float max() { return 3.40282e+38; }
-  static constexpr float lowest() { return -3.40282e+38; }
-};
-
-template <typename T> struct xpu_less {
-  bool operator()(const T &lhs, const T &rhs) { return lhs < rhs; }
-};
-
-template <typename T> struct xpu_greater {
-  bool operator()(const T &lhs, const T &rhs) { return lhs > rhs; }
-};
-
-template <typename T> struct InitValue;
-
-template <typename T> struct InitValue<xpu_less<T>> {
-  constexpr static auto value = xpu_numeric_limits<T>::max;
-};
-
-template <typename T> struct InitValue<xpu_greater<T>> {
-  constexpr static auto value = xpu_numeric_limits<T>::lowest;
-};
 
 TEST(ConstTest, Test) {
   print("lowest:", std::numeric_limits<float>::max());

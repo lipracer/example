@@ -47,14 +47,32 @@ struct SimpleTensorStorage
 template <typename, typename> class Tensor;
 
 class TensorVisitor {
-private:
+public:
+  size_t totalElements() const {
+    return std::accumulate(shape_.begin(), shape_.end(), 1,
+                           std::multiplies<>());
+  }
+
+  template <typename T, typename... R> size_t offset(T t, R... r) {
+    return t * strides_[strides_.size() - sizeof...(R) - 1] + offset(r...);
+  }
+
+  void rehsape(const std::vector<int64_t> &shape,
+               const std::vector<int64_t> &strides) {
+    shape_ = shape;
+    strides_ = strides;
+  }
+
+  size_t offset() { return 0; }
+
+protected:
   std::vector<int64_t> shape_;
   std::vector<int64_t> strides_;
   std::vector<int64_t> offsets_;
 };
 
 template <typename StorageT = SimpleTensorStorageBase<void>>
-class TensorBaseImpl {
+class TensorBaseImpl : public TensorVisitor {
   template <typename, typename> friend class Tensor;
 
 public:
@@ -74,7 +92,7 @@ private:
 using TensorBase = TensorBaseImpl<>;
 
 template <typename EleT, typename StorageT = SimpleTensorStorage<EleT>>
-class Tensor {
+class Tensor : public TensorVisitor {
 public:
   using element_type = EleT;
   Tensor(StorageT storage) : storage_(storage) {}
@@ -92,26 +110,9 @@ public:
 
   Tensor(const std::vector<EleT>& vectorData) {}
 
-  size_t totalElements() const {
-    return std::accumulate(shape_.begin(), shape_.end(), 1,
-                           std::multiplies<>());
-  }
-
-  template <typename T, typename... R> size_t offset(T t, R... r) {
-    return t * strides_[strides_.size() - sizeof...(R) - 1] + offset(r...);
-  }
-
-  size_t offset() { return 0; }
-
   template <typename... T> EleT &at(T... t) {
     size_t ofs = offset(t...);
     return *(storage_.getData() + ofs);
-  }
-
-  void rehsape(const std::vector<int64_t> &shape,
-               const std::vector<int64_t> &strides) {
-    shape_ = shape;
-    strides_ = strides;
   }
 
   std::string toString() const {
@@ -124,8 +125,6 @@ public:
 
 private:
   StorageT storage_;
-  std::vector<int64_t> shape_;
-  std::vector<int64_t> strides_;
 };
 
 template <typename T>
