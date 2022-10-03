@@ -66,7 +66,7 @@ TEST(ConstTest, Test) {
   auto tensor0 = tensorBase.cast<int>();
   std::cout << tensor0 << std::endl;
 
-  tensor0.rehsape({2, 4, 5, 8}, {480, 8, 96, 1});
+  tensor0.reshape({2, 4, 5, 8}, {480, 8, 96, 1});
 
   for (size_t i = 0; i < 2; i++) {
     std::cout << std::endl;
