@@ -57,30 +57,47 @@ TEST(ConstTest, Test) {
 
   Tensor<int> tensor({1, 2, 3});
 
-  std::cout << tensor << std::endl;
   size_t total = 3 * 4 * 8 * 5 * 2;
   auto ptr = ::malloc(total * sizeof(int));
   int *intPtr = static_cast<int *>(ptr);
   std::iota(intPtr, intPtr + total, 0);
   TensorBase tensorBase(ptr, total);
   auto tensor0 = tensorBase.cast<int>();
-  std::cout << tensor0 << std::endl;
 
-  tensor0.reshape({2, 4, 5, 8}, {480, 8, 96, 1});
+  // tensor0.reshape({2, 4, 5, 8}, {480, 8, 96, 1});
 
-  for (size_t i = 0; i < 2; i++) {
-    std::cout << std::endl;
-    for (size_t j = 0; j < 4; j++) {
-      std::cout << std::endl;
-      for (size_t k = 0; k < 5; k++) {
-        std::cout << std::endl;
-        for (size_t l = 0; l < 8; l++) {
-          std::cout << "offset:" << tensor0.offset(i, j, k, l)
-                    << " value:" << tensor0.at(i, j, k, l) << " ";
-        }
-      }
+  std::vector<int64_t> shapes = {2, 4, 5, 8};
+  std::vector<int64_t> strides = {480, 8, 96, 1};
+  // std::vector<int64_t> strides = {0, 0, 0, 0};
+  std::vector<int64_t> offsets = {0, 0, 0, 0};
+
+  auto newTensor = tensor0.as_stride(shapes, strides, offsets);
+
+  size_t i = 0;
+  newTensor.for_each([&](int &data) {
+    if (i++ % 8 == 0) {
+      std::cout << "\n";
     }
-  }
+    std::cout << data << " ";
+  });
+  std::cout << std::endl;
 
-  std::cout << "offset:" << tensor0.offset(0, 1, 0, 0) << std::endl;
+  auto newTensor0 = newTensor.flatten();
+
+  std::cout << newTensor0 << std::endl;
+
+  // for (size_t i = 0; i < 2; i++) {
+  //   std::cout << std::endl;
+  //   for (size_t j = 0; j < 4; j++) {
+  //     std::cout << std::endl;
+  //     for (size_t k = 0; k < 5; k++) {
+  //       std::cout << std::endl;
+  //       for (size_t l = 0; l < 8; l++) {
+  //         std::cout << "offset:" << tensor0.offset(i, j, k, l)
+  //                   << " value:" << tensor0.at(i, j, k, l) << " ";
+  //       }
+  //     }
+  //   }
+  // }
+
 }
