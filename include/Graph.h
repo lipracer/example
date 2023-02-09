@@ -69,9 +69,37 @@ class Graph {
   template <typename U>
   friend std::ostream& operator<<(std::ostream& os, const Graph<U>& graph);
 
+  template <typename U>
+  friend void topologicSort(Graph<U>& graph);
+
  private:
   std::list<GraphNode<T>> nodes_;
 };
+
+template <typename U> void topologicSort(Graph<U> &graph) {
+  enum VisitState {
+    unvisit = 0,
+    visiting,
+    visited,
+  };
+  std::vector<GraphNode<U> *> result;
+  std::vector<GraphNode<U> *> stack = {&graph.nodes().front()};
+  std::unordered_map<GraphNode<U> *, VisitState> visitMap;
+  while (!stack.empty()) {
+    auto cur = stack.back();
+    auto &it = visitMap[cur];
+    if (it.second == unvisit) {
+      it.second = visiting;
+    } else {
+      if (it.second == visiting) {
+
+      } else if (it.second == visited) {
+
+      } else {
+      }
+    }
+  }
+}
 
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const GraphNode<T>& node) {

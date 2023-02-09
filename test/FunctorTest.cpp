@@ -1,3 +1,13 @@
+
+#include <signal.h>
+#include <semaphore.h>
+#include <fcntl.h>    /* For O_RDWR */
+#include <unistd.h>   /* For open(), creat() */
+#include <stdio.h>
+#include <string.h>
+#include <sys/ipc.h>
+#include <sys/shm.h> 
+
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -7,12 +17,25 @@
 #include <vector>
 #include <bitset>
 #include <limits>
+#include <fstream>
+#include <algorithm>
+#include <random>
+#include <thread>
+#include <condition_variable>
+#include <mutex>
+#include <chrono>
+#include <future> 
+
+#include "network/SimpleHttpServer.h"
 
 #include "Test.h"
 #include "STLExt.h"
 #include "Tensor.hpp"
+#include "utils/ProcessBarrier.h"
 
 using namespace example;
+
+#define random(n) (::rand() % n)
 
 struct Functor {
   int operator()(int n) {
@@ -26,21 +49,6 @@ TEST(FunctorTest, object) {
   myFunc(0);
 }
 
-struct A {
-  A(){}
-  A(const A& a) {
-    std::cout << "copy constructor\n";
-  }
-  A(A&& a) {
-    std::cout << "move constructor\n";
-  }
-  A &operator=(A &&a) {
-    std::cout << "assign constructor\n";
-    return *this;
-  }
-};
-
-
 void print(const std::string& msg, float f) {
   std::cout << "float:" << f + 10.0 << std::endl;
   int a = 0;
@@ -49,55 +57,48 @@ void print(const std::string& msg, float f) {
   std::cout << msg << bs << std::endl;
 }
 
+template <typename T>
+std::tuple<std::shared_ptr<T>, size_t> loadFromFile(const std::string &name) {
+  std::tuple<std::shared_ptr<T>, size_t> result = {nullptr, 0};
+  std::ifstream ifs(name);
+  ifs.seekg(0, std::ios::end);
+  size_t length = ifs.tellg();
+  ifs.seekg(0, std::ios::beg);
+  auto data = new float[length];
+  ifs.read(reinterpret_cast<char *>(data), length);
+  ifs.close();
+  std::get<0>(result).reset(data);
+  std::get<1>(result) = length / sizeof(T);
+  return result;
+}
 
-TEST(ConstTest, Test) {
-  print("lowest:", std::numeric_limits<float>::max());
-  print("-inf:", std::numeric_limits<float>::lowest());
-  std::cout << std::numeric_limits<int>::epsilon() << std::endl;
+TEST(BarrerTest, barrer) {
 
-  Tensor<int> tensor({1, 2, 3});
+  // constexpr size_t kThreadCount = 8;
+  // std::vector<std::future<std::string>> futures;
 
-  size_t total = 3 * 4 * 8 * 5 * 2;
-  auto ptr = ::malloc(total * sizeof(int));
-  int *intPtr = static_cast<int *>(ptr);
-  std::iota(intPtr, intPtr + total, 0);
-  TensorBase tensorBase(ptr, total);
-  auto tensor0 = tensorBase.cast<int>();
+  // auto barrerThreadBody = [](size_t n, size_t id) {
+  //   unsigned seed =
+  //       std::chrono::system_clock::now().time_since_epoch().count();
+  //   std::mt19937 g1(seed);
+  //   std::uniform_int_distribution<int> distribution(0, 2000);
 
-  // tensor0.reshape({2, 4, 5, 8}, {480, 8, 96, 1});
+  //   thread_local static std::unique_ptr<ProcessBarrierBase> barrier;
+  //   barrier = createBarrier(n, id);
 
-  std::vector<int64_t> shapes = {2, 4, 5, 8};
-  std::vector<int64_t> strides = {480, 8, 96, 1};
-  // std::vector<int64_t> strides = {0, 0, 0, 0};
-  std::vector<int64_t> offsets = {0, 0, 0, 0};
-
-  auto newTensor = tensor0.as_stride(shapes, strides, offsets);
-
-  size_t i = 0;
-  newTensor.for_each([&](int &data) {
-    if (i++ % 8 == 0) {
-      std::cout << "\n";
-    }
-    std::cout << data << " ";
-  });
-  std::cout << std::endl;
-
-  auto newTensor0 = newTensor.flatten();
-
-  std::cout << newTensor0 << std::endl;
-
-  // for (size_t i = 0; i < 2; i++) {
-  //   std::cout << std::endl;
-  //   for (size_t j = 0; j < 4; j++) {
-  //     std::cout << std::endl;
-  //     for (size_t k = 0; k < 5; k++) {
-  //       std::cout << std::endl;
-  //       for (size_t l = 0; l < 8; l++) {
-  //         std::cout << "offset:" << tensor0.offset(i, j, k, l)
-  //                   << " value:" << tensor0.at(i, j, k, l) << " ";
-  //       }
-  //     }
+  //   for (size_t i = 0; i < 10; ++i) {
+  //     int dice_roll = distribution(g1);
+  //     std::cout << "id:" << id << " sleep " << dice_roll << "..." << std::endl;
+  //     std::this_thread::sleep_for(std::chrono::milliseconds(dice_roll));
+  //     std::cout << "id:" << id << " run into sync point." << std::endl;
+  //     barrier->wait();
   //   }
+  //   return barrier->getStatisticsInfo();
+  // };
+  // for (size_t i = 0; i < kThreadCount; ++i) {
+  //   futures.emplace_back(std::async(barrerThreadBody, kThreadCount, i));
   // }
-
+  // for (auto &f : futures) {
+  //   std::cout << f.get();
+  // }
 }

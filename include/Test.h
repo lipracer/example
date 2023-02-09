@@ -1,6 +1,8 @@
 #ifndef INCLUDE_TEST_H
 #define INCLUDE_TEST_H
 
+#include <string>
+
 template <typename T>
 class SimpleList {
   struct SimpleListNode {
@@ -75,17 +77,20 @@ class TestCaseCollection {
 };
 
 class SuperTestClass {
- protected:
-  SuperTestClass() { TestCaseCollection::instance().push(this); }
-
- public:
+public:
+  SuperTestClass(const std::string &name) : name_(name) {
+    TestCaseCollection::instance().push(this);
+  }
   virtual void Testing() const = 0;
+  const std::string &name() { return name_; }
+  std::string name_;
 };
 
-#define TEST(class_, name)                            \
-  static class class_##name : public SuperTestClass { \
-    void Testing() const override;                    \
-  } UNIQUE_NAME(class_##name);                        \
+#define TEST(class_, name)                                                     \
+  static class class_##name : public SuperTestClass {                          \
+    using SuperTestClass::SuperTestClass;                                      \
+    void Testing() const override;                                             \
+  } UNIQUE_NAME(class_##name)(#class_ "::" #name);                             \
   void class_##name::Testing() const
 
 #endif

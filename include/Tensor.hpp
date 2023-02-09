@@ -106,9 +106,9 @@ class TensorBaseImpl : public TensorVisitor {
   template <typename, typename> friend class Tensor;
 
 public:
-  TensorBaseImpl(void *data, size_t len)
+  TensorBaseImpl(void *data, size_t len, size_t nByte)
       : TensorVisitor(std::vector<int64_t>{static_cast<int64_t>(len)}),
-        storage_(data, len) {}
+        storage_(data, len * nByte) {}
 
   template <typename T> auto cast() {
     return *reinterpret_cast<Tensor<T, SimpleTensorStorage<T>> *>(this);
@@ -270,7 +270,7 @@ public:
   }
 
   void dumpToFile(const std::string &path, DUMP_FMT fmt) {
-    std::ofstream ofs(path);
+    // std::ofstream ofs(path);
   }
   void loadFromFile() {}
 
