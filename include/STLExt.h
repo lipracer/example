@@ -134,6 +134,26 @@ std::ostream& operator<<(std::ostream& os, std::vector<T> array) {
   return os;
 }
 
+template <typename IterT>
+class Range {
+ public:
+  Range(IterT begin, IterT end) : begin_(begin), end_(end) {}
+  auto begin() const { return begin_; }
+  auto end() const { return end_; }
+
+ private:
+  IterT begin_, end_;
+};
+
+template <typename IterT>
+Range<IterT> makeRange(IterT begin, IterT end) {
+    return Range<IterT>(begin, end);
+}
+
+template <typename ContainerT>
+auto makeRange(const ContainerT& c) {
+    return makeRange(std::begin(c), std::end(c));
+}
 
 }  // namespace example
 
