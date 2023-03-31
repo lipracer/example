@@ -6,9 +6,9 @@
     "configurations": [
         {
             "name": "main",
-            "type": "cppdbg",
+            "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test/example",
+            "program": "${workspaceFolder}/build/test/Test",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -25,4 +25,5 @@
             "preLaunchTask": "main",
             "miDebuggerPath": "/usr/bin/gdb"
         }
+    ]
 }

@@ -1,13 +1,33 @@
 #ifndef UTILS_PROCESS_BARRIER
 #define UTILS_PROCESS_BARRIER
 
-#include <memory>
 #include <chrono>
 #include <functional>
 #include <iosfwd>
 #include <iostream>
+#include <memory>
+#include <sstream>
 
-namespace example {
+namespace utils {
+
+void SyncLog(const std::string &str);
+
+class SimpleLogWrapper {
+public:
+  template <typename T> void put(T &&t) const { ss << std::forward<T>(t); }
+  ~SimpleLogWrapper() { SyncLog(ss.str()); }
+
+private:
+  mutable std::stringstream ss;
+};
+
+template <typename T>
+inline const SimpleLogWrapper &operator<<(const SimpleLogWrapper &w, T &&t) {
+  w.put(std::forward<T>(t));
+  return w;
+}
+
+#define SLOGW() SimpleLogWrapper()
 
 enum class BarrierState : int {
   initialize = 0,
@@ -35,8 +55,10 @@ inline std::ostream &operator<<(std::ostream &os, BarrierState state) {
   return os;
 }
 
+const char *getUnitStr();
+
 using TimeoutCallBack = std::function<void(const BarrierState *)>;
-using duration_type = std::chrono::seconds;
+using duration_type = std::chrono::milliseconds;
 
 class ProcessBarrierBase {
 public:
@@ -55,15 +77,15 @@ public:
 
   std::function<void(size_t id, duration_type dur)> onWaitStart =
       [](size_t id, duration_type dur) {
-        std::cout << "device" << id << "since ctor duration:"
-                  << std::chrono::duration_cast<duration_type>(dur).count()
-                  << "ms";
+        SLOGW() << "device" << id << " start wait since ctor duration:"
+                << std::chrono::duration_cast<duration_type>(dur).count()
+                << getUnitStr();
       };
   std::function<void(size_t id, duration_type dur)> onWaitEnd =
       [](size_t id, duration_type dur) {
-        std::cout << "device" << id << "since wait duration:"
-                  << std::chrono::duration_cast<duration_type>(dur).count()
-                  << "ms";
+        SLOGW() << "device" << id << " end wait since start wait duration:"
+           << std::chrono::duration_cast<duration_type>(dur).count()
+           << getUnitStr();
       };
 
 protected:
@@ -73,6 +95,6 @@ protected:
 
 std::unique_ptr<ProcessBarrierBase> createBarrier(size_t clientSize, size_t id);
 
-} // namespace example
+} // namespace utils
 
 #endif

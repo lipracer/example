@@ -19,7 +19,7 @@
 #include "Graph.h"
 #include "STLExt.h"
 #include "Tensor.hpp"
-#include "utils/ProcessBarrier.h"
+#include "../utils/ProcessBarrier.h"
 
 using namespace example;
 

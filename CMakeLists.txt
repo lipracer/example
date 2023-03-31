@@ -11,4 +11,5 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_subdirectory(include)
 add_subdirectory(lib)
+add_subdirectory(utils)
 add_subdirectory(test)
