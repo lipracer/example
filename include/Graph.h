@@ -108,7 +108,7 @@ std::vector<GraphNode<U>*> topologicSort(
           stack.push_back(successor);
         } else if (iter->second == visiting) {
           EXPECT(visitMap[successor] == unvisit, "find cycle!");
-        } else {  // visited do nothine
+        } else {  // visited do nothing
         }
       }
     } else if (iter->second == visiting) {

@@ -18,7 +18,6 @@
 #include "DominatorTree.h"
 #include "Graph.h"
 #include "STLExt.h"
-#include "Tensor.hpp"
 #include "../utils/ProcessBarrier.h"
 
 using namespace example;

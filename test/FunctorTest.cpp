@@ -7,7 +7,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <unistd.h> /* For open(), creat() */
-
+// #include <link.h>
 #include <algorithm>
 #include <bitset>
 #include <cassert>
@@ -27,11 +27,9 @@
 #include <thread>
 #include <vector>
 
-#include "network/SimpleHttpServer.h"
 
 #include "../utils/ProcessBarrier.h"
 #include "STLExt.h"
-#include "Tensor.hpp"
 #include "Test.h"
 
 using namespace utils;

@@ -13,7 +13,6 @@
 
 #include "Graph.h"
 #include "STLExt.h"
-#include "Tensor.hpp"
 #include "Test.h"
 
 using namespace example;
